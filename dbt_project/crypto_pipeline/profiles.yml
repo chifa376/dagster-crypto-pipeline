@@ -1,0 +1,6 @@
+crypto_pipeline:
+  outputs:
+    dev:
+      type: duckdb
+      path: ../../data/crypto.duckdb
+  target: dev

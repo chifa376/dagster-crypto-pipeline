@@ -15,3 +15,5 @@ plotly
 
 pytest
 pytest-mock
+
+duckdb
