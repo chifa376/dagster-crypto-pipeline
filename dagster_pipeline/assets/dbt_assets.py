@@ -10,6 +10,11 @@ DBT_PROJECT_DIR = Path(__file__).joinpath(
 DBT_PROFILES_DIR = DBT_PROJECT_DIR
 DBT_MANIFEST_PATH = DBT_PROJECT_DIR / "target" / "manifest.json"
 
+dbt_resource = DbtCliResource(
+    project_dir=str(DBT_PROJECT_DIR),
+    profiles_dir=str(DBT_PROFILES_DIR),
+)
+
 
 @dbt_assets(manifest=DBT_MANIFEST_PATH)
 def crypto_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
