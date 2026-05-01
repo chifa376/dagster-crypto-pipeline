@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    tables:
+      - name: crypto_prices
+
+models:
+  - name: stg_prices
+    columns:
+      - name: crypto
+        tests:
+          - not_null
+
+      - name: price_usd
+        tests:
+          - not_null

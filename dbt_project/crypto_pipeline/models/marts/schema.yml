@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: daily_summary
+    columns:
+      - name: crypto
+        tests:
+          - not_null
+
+      - name: avg_price_usd
+        tests:
+          - not_null
+
+  - name: moving_averages
+    columns:
+      - name: crypto
+        tests:
+          - not_null
+
+      - name: moving_avg_3
+        tests:
+          - not_null
