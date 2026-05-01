@@ -1,7 +1,7 @@
 from dagster import ScheduleDefinition
-from dagster_pipeline.jobs import crypto_job
+from dagster_pipeline.jobs import full_pipeline_job
 
-crypto_schedule = ScheduleDefinition(
-    job=crypto_job,
-    cron_schedule="0 * * * *",  # chaque heure
+full_pipeline_schedule = ScheduleDefinition(
+    job=full_pipeline_job,
+    cron_schedule="*/5 * * * *",  # toutes les 5 min
 )
