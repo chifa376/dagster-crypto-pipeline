@@ -218,3 +218,5 @@ dbt_project/crypto_pipeline/logs/
 # Dagster
 .dagster/
 DAGSTER_HOME/
+.tmp_dagster_home_*/
+*.db
