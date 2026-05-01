@@ -1,9 +1,16 @@
-from dagster_dbt import dbt_assets, DbtCliResource
+from pathlib import Path
 
-dbt_resource = DbtCliResource(
-    project_dir="dbt_project/crypto_pipeline",
-)
+from dagster import AssetExecutionContext
+from dagster_dbt import DbtCliResource, dbt_assets
 
-@dbt_assets(manifest="dbt_project/crypto_pipeline/target/manifest.json")
-def crypto_dbt_assets(context, dbt: DbtCliResource):
-    yield from dbt.cli(["run"], context=context).stream()
+DBT_PROJECT_DIR = Path(__file__).joinpath(
+    "..", "..", "..", "dbt_project", "crypto_pipeline"
+).resolve()
+
+DBT_PROFILES_DIR = DBT_PROJECT_DIR
+DBT_MANIFEST_PATH = DBT_PROJECT_DIR / "target" / "manifest.json"
+
+
+@dbt_assets(manifest=DBT_MANIFEST_PATH)
+def crypto_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
+    yield from dbt.cli(["build"], context=context).stream()
