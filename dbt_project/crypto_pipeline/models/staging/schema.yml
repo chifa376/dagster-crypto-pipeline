@@ -8,10 +8,10 @@ sources:
 models:
   - name: stg_prices
     columns:
-      - name: coin_id
+      - name: crypto
         tests:
           - not_null
 
-      - name: current_price
+      - name: price_usd
         tests:
           - not_null

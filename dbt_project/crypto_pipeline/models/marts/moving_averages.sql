@@ -1,14 +1,10 @@
 select
-    coin_id,
-    symbol,
-    name,
-    price_date,
-    avg_price,
+    crypto,
+    price_usd,
+    avg(price_usd) over (
+        partition by crypto
+        order by price_usd
+        rows between 2 preceding and current row
+    ) as moving_avg_3
 
-    avg(avg_price) over (
-        partition by coin_id
-        order by price_date
-        rows between 6 preceding and current row
-    ) as moving_avg_7d
-
-from {{ ref('daily_summary') }}
+from {{ ref('stg_prices') }}

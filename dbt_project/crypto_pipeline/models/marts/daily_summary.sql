@@ -1,16 +1,11 @@
 select
-    coin_id,
-    symbol,
-    name,
-    date(last_updated) as price_date,
-
-    avg(current_price) as avg_price,
-    min(current_price) as min_price,
-    max(current_price) as max_price,
-
-    avg(total_volume) as avg_volume,
-    avg(market_cap) as avg_market_cap
+    crypto,
+    avg(price_usd) as avg_price_usd,
+    avg(price_eur) as avg_price_eur,
+    avg(market_cap_usd) as avg_market_cap_usd,
+    avg(change_24h_usd) as avg_change,
+    count(*) as nb_records
 
 from {{ ref('stg_prices') }}
 
-group by coin_id, symbol, name, date(last_updated)
+group by crypto
