@@ -34,7 +34,22 @@ def crypto_prices_raw():
     df = pd.DataFrame(rows)
 
     conn = get_connection()
-    conn.execute("CREATE OR REPLACE TABLE crypto_prices_raw AS SELECT * FROM df")
+
+    # 1. créer la table si elle n'existe pas
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS crypto_prices_raw (
+            crypto VARCHAR,
+            price_usd DOUBLE,
+            price_eur DOUBLE,
+            market_cap_usd DOUBLE,
+            change_24h_usd DOUBLE,
+            extracted_at TIMESTAMP
+        )
+    """)
+
+    # 2. ajouter les nouvelles données (sans supprimer l'ancien)
+    conn.execute("INSERT INTO crypto_prices_raw SELECT * FROM df")
+
     conn.close()
 
     return df
