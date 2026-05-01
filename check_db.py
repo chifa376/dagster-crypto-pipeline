@@ -16,4 +16,11 @@ df = conn.execute("""
 """).fetchdf()
 print(df)
 
+print("=== moving_averages ===")
+df = conn.execute("""
+    SELECT *
+    FROM moving_averages
+""").fetchdf()
+print(df)
+
 conn.close()
