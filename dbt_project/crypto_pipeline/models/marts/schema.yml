@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: daily_summary
+    columns:
+      - name: coin_id
+        tests:
+          - not_null
+
+      - name: avg_price
+        tests:
+          - not_null
+
+  - name: moving_averages
+    columns:
+      - name: coin_id
+        tests:
+          - not_null
+
+      - name: moving_avg_7d
+        tests:
+          - not_null
