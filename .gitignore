@@ -205,3 +205,16 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Local data / DuckDB
+data/
+*.duckdb
+
+# dbt
+dbt_project/crypto_pipeline/target/
+dbt_project/crypto_pipeline/dbt_packages/
+dbt_project/crypto_pipeline/logs/
+
+# Dagster
+.dagster/
+DAGSTER_HOME/
