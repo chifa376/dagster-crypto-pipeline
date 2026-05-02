@@ -2,8 +2,9 @@ version: 2
 
 sources:
   - name: raw
+    schema: main
     tables:
-      - name: crypto_prices
+      - name: crypto_prices_raw
 
 models:
   - name: stg_prices
