@@ -1,0 +1,22 @@
+services:
+  dagster:
+    build: .
+    container_name: dagster_crypto_pipeline
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: >
+      sh -c "cd dbt_project/crypto_pipeline &&
+             dbt parse &&
+             cd /app &&
+             dagster dev -m dagster_pipeline.definitions -h 0.0.0.0"
+
+  dashboard:
+    build: .
+    container_name: crypto_dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    command: streamlit run dashboard/app.py --server.address=0.0.0.0

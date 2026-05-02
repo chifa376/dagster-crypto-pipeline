@@ -1,5 +1,6 @@
 import streamlit as st
 import duckdb
+
 import pandas as pd
 import plotly.express as px
 COLOR_PALETTE = ["#2F80ED", "#6C2BD9", "#00B8D9", "#20C997", "#FFB020"]
