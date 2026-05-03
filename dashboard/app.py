@@ -1,8 +1,10 @@
 import streamlit as st
 import duckdb
-
 import pandas as pd
 import plotly.express as px
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
 COLOR_PALETTE = ["#2F80ED", "#6C2BD9", "#00B8D9", "#20C997", "#FFB020"]
 # ================= CONFIG =================
 st.set_page_config(
@@ -41,7 +43,7 @@ st.sidebar.markdown("""
 
 page = st.sidebar.radio(
     "Navigation",
-    ["🏠 Accueil", "💰 Prix", "🏦 Market Cap", "📈 Tendances", "🧾 Données"]
+    ["🏠 Accueil", "💰 Prix", "🏦 Market Cap", "📈 Tendances", "🤖 Prédiction", "🧾 Données"]
 )
 
 crypto_list = df_raw["crypto"].unique().tolist()
@@ -380,6 +382,114 @@ elif page == "📈 Tendances":
     )
     fig2.update_layout(height=420, transition_duration=700)
     st.plotly_chart(fig2, use_container_width=True)
+
+# ================= PRÉDICTION =================
+elif page == "🤖 Prédiction":
+    st.subheader(f"Prédiction et état du marché - {selected_crypto.capitalize()}")
+
+    df_pred = df_crypto.copy().sort_values("extracted_at")
+
+    if len(df_pred) < 3:
+        st.warning("Pas assez de données pour générer une prédiction fiable.")
+    else:
+        df_pred["time_index"] = np.arange(len(df_pred))
+
+        X = df_pred[["time_index"]]
+        y = df_pred["price_usd"]
+
+        model = LinearRegression()
+        model.fit(X, y)
+
+        next_index = np.array([[len(df_pred)]])
+        predicted_price = model.predict(next_index)[0]
+
+        current_price = df_pred["price_usd"].iloc[-1]
+        variation_pred = ((predicted_price - current_price) / current_price) * 100
+        last_change_24h = latest["change_24h_usd"]
+
+        # Moyenne mobile actuelle
+        current_ma = df_ma_crypto["moving_avg_3"].iloc[-1]
+
+        # Market Mood
+        if last_change_24h > 1 and current_price > current_ma:
+            market_mood = "🟢 Momentum positif"
+            interpretation = "Le prix est supérieur à sa moyenne mobile avec une variation 24h positive."
+        elif abs(last_change_24h) <= 1:
+            market_mood = "🟡 Marché stable"
+            interpretation = "Le marché présente une faible variation sur 24h."
+        elif abs(last_change_24h) > 3:
+            market_mood = "🟠 Marché volatil"
+            interpretation = "Le marché montre une forte variation, ce qui indique une volatilité élevée."
+        else:
+            market_mood = "🔴 Correction du marché"
+            interpretation = "Le marché montre une baisse ou un signal de correction."
+
+        c1, c2, c3 = st.columns(3)
+
+        c1.metric("Prix actuel", f"{current_price:,.2f} $")
+        c2.metric("Prix prédit", f"{predicted_price:,.2f} $")
+        c3.metric("Variation prévue", f"{variation_pred:.4f}%")
+
+        if "🟢" in market_mood:
+            st.success(f"### État du marché : {market_mood}")
+        elif "🟡" in market_mood:
+            st.warning(f"### État du marché : {market_mood}")
+        elif "🟠" in market_mood:
+            st.warning(f"### État du marché : {market_mood}")
+        else:
+            st.error(f"### État du marché : {market_mood}")
+
+        st.info(f"""
+        📌 Interprétation :
+
+        Le prix actuel est {'au-dessus' if current_price > current_ma else 'en dessous'} de sa moyenne mobile,
+        avec une variation 24h de {last_change_24h:.2f}%.
+
+        Cela indique une dynamique {'positive' if last_change_24h > 0 else 'négative'} du marché.
+        """)
+
+        df_future = pd.DataFrame({
+            "extracted_at": [df_pred["extracted_at"].iloc[-1] + pd.Timedelta(minutes=5)],
+            "price_usd": [predicted_price],
+            "type": ["Prix prédit"]
+        })
+
+        df_real = df_pred[["extracted_at", "price_usd"]].copy()
+        df_real["type"] = "Prix réel"
+
+        df_future = pd.DataFrame({
+            "extracted_at": [df_pred["extracted_at"].iloc[-1] + pd.Timedelta(minutes=5)],
+            "price_usd": [predicted_price],
+            "Type": ["Prix prédit"]
+        })
+
+        df_real = df_pred[["extracted_at", "price_usd"]].copy()
+        df_real["Type"] = "Prix réel"
+
+        df_chart = pd.concat([df_real, df_future], ignore_index=True)
+
+        fig = px.line(
+            df_chart,
+            x="extracted_at",
+            y="price_usd",
+            color="Type",
+            markers=True,
+            title=f"Prix réel vs prix prédit - {selected_crypto.capitalize()}",
+            color_discrete_map={
+                "Prix réel": "#2F80ED",
+                "Prix prédit": "#6C2BD9"
+            }
+        )
+
+        fig.update_layout(
+            height=420,
+            legend_title_text="Type de prix",
+            margin=dict(l=60, r=40, t=70, b=60)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.caption("Cette prédiction est une aide à l’analyse basée sur les données disponibles.")
 
 # ================= DONNÉES =================
 elif page == "🧾 Données":

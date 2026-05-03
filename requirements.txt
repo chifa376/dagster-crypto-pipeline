@@ -12,6 +12,7 @@ python-dotenv
 
 streamlit
 plotly
+scikit-learn
 
 pytest
 pytest-mock
